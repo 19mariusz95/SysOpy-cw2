@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/times.h>
+#include <stdint.h>
 
 void sortlib(char *path, int length);
 
@@ -25,13 +27,29 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+    clock_t time;
+    struct tms *t_cpu1 = malloc(sizeof(struct tms));
+    struct tms *t_cpu2 = malloc(sizeof(struct tms));
+    if (t_cpu1 == NULL || t_cpu2 == NULL) {
+        printf("%s", "Allocation memory failed");
+        return 1;
+    }
+
+    time = times(t_cpu1);
     if (strcmp(fun, "lib") == 0) {
         sortlib(path, length);
     } else {
         sortsys(path, length);
     }
 
+    time = times(t_cpu2) - time;
 
+    printf("Real Time: %jd, User Time: %jd, System Time: %jd\n",
+           (intmax_t) time, (intmax_t) (t_cpu2->tms_utime - t_cpu1->tms_utime),
+           (intmax_t) (t_cpu2->tms_stime - t_cpu1->tms_stime));
+
+    free(t_cpu1);
+    free(t_cpu2);
     return 0;
 }
 
