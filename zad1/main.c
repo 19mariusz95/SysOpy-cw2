@@ -3,6 +3,7 @@
 #include <string.h>
 #include <sys/times.h>
 #include <stdint.h>
+#include <unistd.h>
 
 void sortlib(char *path, int length);
 
@@ -53,10 +54,22 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-void sortsys(char *path, int length) {
-    printf("%s\n", "Trolololololo");
+void sortsys(char *path, int length) {  //read write
+    FILE *file = fopen(path, "r");
+    if (file == NULL) {
+        printf("File not opened");
+        exit(1);
+    }
+
+    fclose(file);
 }
 
-void sortlib(char *path, int length) {
-    printf("%s\n", "Trolololololo");
+void sortlib(char *path, int length) { //fread fwrite
+    FILE *file = fopen(path, "rw");
+    if (file == NULL) {
+        printf("File not opened");
+        exit(1);
+    }
+    
+    fclose(file);
 }
