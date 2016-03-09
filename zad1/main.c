@@ -3,11 +3,15 @@
 #include <string.h>
 #include <sys/times.h>
 #include <stdint.h>
-#include <unistd.h>
 
 void sortlib(char *path, int length);
 
 void sortsys(char *path, int length);
+
+struct record {
+    char *tmp;
+    size_t length;
+};
 
 int main(int argc, char *argv[]) {
 
@@ -70,6 +74,12 @@ void sortlib(char *path, int length) { //fread fwrite
         printf("File not opened");
         exit(1);
     }
-    
+    struct record *tmp = malloc(sizeof(struct record));
+    tmp->tmp = malloc(length * sizeof(char));
+    tmp->length = fread(tmp->tmp, 1, (size_t) length, file);
+    while (tmp->length > 0) {
+        printf("%s\n", tmp->tmp);
+        tmp->length = fread(tmp->tmp, 1, (size_t) length, file);
+    }
     fclose(file);
 }
