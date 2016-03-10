@@ -3,6 +3,12 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <string.h>
+#include <ftw.h>
+
+
+char *permissions;
+
+typedef struct FTW FTW;
 
 void find1(char *path, char *permissions);
 
@@ -10,20 +16,33 @@ void find2(char *path, char *permissions);
 
 int fun(char *permissions, struct stat stat1);
 
+void nftw(char *path, int (*info)(const char *, const struct stat *, int, struct FTW *), int i, int flag);
+
+int display_info(const char *fpath, const struct stat *sb, int tflag, struct FTW *ftwbus) {
+
+    if (fun(*sb)) {
+        char p[PATH_MAX];
+        realpath(fpath, p);
+        printf("%s\n", p);
+
+    }
+    return 0;
+}
+
 int main(int argc, char *argv[]) {
     if (argc < 3) {
         printf("%s\n", "You have to input all arguments");
         return 1;
     }
     char *path = argv[1];
-    char *permissions = argv[2];
+    permissions = argv[2];
 
     if (strlen(permissions) != 9) {
         printf("Trolollo");
         exit(1);
     }
 
-    find1(path, permissions);
+    find2(path, permissions);
 
     return 0;
 }
@@ -54,7 +73,7 @@ void find1(char *path, char *permissions) {
             find1(fn, permissions);
         }
         else if (S_ISREG(filestat.st_mode) == 1) {
-            if (fun(permissions, filestat))
+            if (fun(filestat))
                 printf("%s\n", ent->d_name);
         }
     }
@@ -62,10 +81,11 @@ void find1(char *path, char *permissions) {
 }
 
 void find2(char *path, char *permissions) {
-    
+    DIR *dir = opendir(path);
+    nftw(path, display_info, 10, FTW_F);
 }
 
-int fun(char *permissions, struct stat stat1) {
+int fun(struct stat stat1) {
     char pr[10];
     pr[9] = '\0';
     if (stat1.st_mode & S_IRUSR)
