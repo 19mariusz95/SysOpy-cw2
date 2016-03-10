@@ -13,6 +13,7 @@ struct record {
     size_t length;
 };
 
+
 int main(int argc, char *argv[]) {
 
     if (argc < 4) {
@@ -70,16 +71,48 @@ void sortsys(char *path, int length) {  //read write
 
 void sortlib(char *path, int length) { //fread fwrite
     FILE *file = fopen(path, "rw");
+    long end;
     if (file == NULL) {
         printf("File not opened");
         exit(1);
     }
     struct record *tmp = malloc(sizeof(struct record));
+    struct record *tmp2 = malloc(sizeof(struct record));
     tmp->tmp = malloc(length * sizeof(char));
-    tmp->length = fread(tmp->tmp, 1, (size_t) length, file);
-    while (tmp->length > 0) {
-        printf("%s\n", tmp->tmp);
+    tmp2->tmp = malloc(length * sizeof(char));
+
+    fseek(file, 0L, SEEK_END);
+    end = ftell(file);
+    fseek(file, 0l, SEEK_SET);
+    int i;
+    for (i = 1; i * length < end; i++) {
+        int j;
+        fseek(file, i * length, SEEK_SET);
         tmp->length = fread(tmp->tmp, 1, (size_t) length, file);
+        for (j = i - 1; j >= 0; j--) {
+            fseek(file, j * length, SEEK_SET);
+            tmp2->length = fread(tmp2->tmp, 1, (size_t) length, file);
+            if (tmp2->tmp[0] <= tmp->tmp[0]) {
+                for (int k = j + 1; k <= i; k++) {
+                    fseek(file, k * length, SEEK_SET);
+                    tmp2->length = fread(tmp2->tmp, 1, (size_t) length, file);
+                    fseek(file, k * length, SEEK_SET);
+                    fwrite(tmp->tmp, 1, (size_t) length, file);
+                    tmp = tmp2;
+                }
+                break;
+            }
+        }
+        if (j == -1) {
+            for (int k = j + 1; k <= i; k++) {
+                fseek(file, k * length, SEEK_SET);
+                tmp2->length = fread(tmp2->tmp, 1, (size_t) length, file);
+                fseek(file, k * length, SEEK_SET);
+                fwrite(tmp->tmp, 1, (size_t) length, file);
+                tmp = tmp2;
+            }
+        }
     }
+
     fclose(file);
 }
