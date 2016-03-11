@@ -45,7 +45,6 @@ void generate(FILE *pFILE, int length, int n) {
     for (i = 0; i < n; i++) {
         char *tmp = randomtext(length);
         fwrite(tmp, 1, (size_t) length, pFILE);
-        long asd = ftell(pFILE);
         free(tmp);
     }
 }

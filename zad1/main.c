@@ -70,7 +70,7 @@ void sortsys(char *path, int length) {  //read write
 }
 
 void sortlib(char *path, int length) { //fread fwrite
-    FILE *file = fopen(path, "rw");
+    FILE *file = fopen(path, "r+");
     long end;
     if (file == NULL) {
         printf("File not opened");
@@ -83,11 +83,9 @@ void sortlib(char *path, int length) { //fread fwrite
 
     fseek(file, 0L, SEEK_END);
     end = ftell(file);
-    printf("%ld\n", end);
     fseek(file, 0l, SEEK_SET);
     long i;
     for (i = 1; i * length < end; i++) {
-        printf("%ld %ld\n", i * length, end);
         long j;
         fseek(file, i * length, SEEK_SET);
         tmp->length = fread(tmp->tmp, 1, (size_t) length, file);
@@ -95,7 +93,6 @@ void sortlib(char *path, int length) { //fread fwrite
             fseek(file, j * length, SEEK_SET);
             tmp2->length = fread(tmp2->tmp, 1, (size_t) length, file);
             if (tmp2->tmp[0] <= tmp->tmp[0]) {
-                printf("%s %c %c\n", "tutaj", tmp2->tmp[0], tmp->tmp[0]);
                 for (long k = j + 1; k <= i; k++) {
                     fseek(file, k * length, SEEK_SET);
                     tmp2->length = fread(tmp2->tmp, 1, (size_t) length, file);
