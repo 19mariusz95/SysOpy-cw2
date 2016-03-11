@@ -3,6 +3,8 @@
 #include <string.h>
 #include <sys/times.h>
 #include <stdint.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 void sortlib(char *path, int length);
 
@@ -60,13 +62,55 @@ int main(int argc, char *argv[]) {
 }
 
 void sortsys(char *path, int length) {  //read write
-    FILE *file = fopen(path, "r");
-    if (file == NULL) {
+    int fd = open(path, O_RDWR);
+    if (fd < 0) {
         printf("File not opened");
         exit(1);
     }
 
-    fclose(file);
+    long end;
+    struct record *tmp = malloc(sizeof(struct record));
+    struct record *tmp2 = malloc(sizeof(struct record));
+    tmp->tmp = malloc(length * sizeof(char));
+    tmp2->tmp = malloc(length * sizeof(char));
+
+    end = lseek(fd, 0, SEEK_END);
+    lseek(fd, 0, SEEK_SET);
+    long i;
+    for (i = 1; i * length < end; i++) {
+        long j;
+        lseek(fd, i * length, SEEK_SET);
+        tmp->length = (size_t) read(fd, tmp->tmp, (size_t) length);
+        for (j = i - 1; j >= 0; j--) {
+            lseek(fd, j * length, SEEK_SET);
+            tmp2->length = (size_t) read(fd, tmp2->tmp, (size_t) length);
+            if (tmp2->tmp[0] <= tmp->tmp[0]) {
+                for (long k = j + 1; k <= i; k++) {
+                    lseek(fd, k * length, SEEK_SET);
+                    tmp2->length = (size_t) read(fd, tmp2->tmp, (size_t) length);
+                    lseek(fd, k * length, SEEK_SET);
+                    write(fd, tmp->tmp, (size_t) length);
+                    strcpy(tmp->tmp, tmp2->tmp);
+                }
+                break;
+            }
+        }
+        if (j == -1) {
+            for (long k = j + 1; k <= i; k++) {
+                lseek(fd, k * length, SEEK_SET);
+                tmp2->length = (size_t) read(fd, tmp2->tmp, (size_t) length);
+                lseek(fd, k * length, SEEK_SET);
+                write(fd, tmp->tmp, (size_t) length);
+                strcpy(tmp->tmp, tmp2->tmp);
+            }
+        }
+    }
+    free(tmp->tmp);
+    free(tmp);
+    free(tmp2->tmp);
+    free(tmp2);
+
+    close(fd);
 }
 
 void sortlib(char *path, int length) { //fread fwrite
