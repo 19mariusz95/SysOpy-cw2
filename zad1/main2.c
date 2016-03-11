@@ -45,15 +45,16 @@ void generate(FILE *pFILE, int length, int n) {
     for (i = 0; i < n; i++) {
         char *tmp = randomtext(length);
         fwrite(tmp, 1, (size_t) length, pFILE);
+        long asd = ftell(pFILE);
         free(tmp);
     }
 }
 
 char *randomtext(int length) {
-    char *tmp = malloc(length * sizeof(char));
+    char *tmp = malloc((length) * sizeof(char));
     int i;
     for (i = 0; i < length; i++) {
-        tmp[i] = (char) (rand() % 120);
+        tmp[i] = (char) (rand() % 95 + 32);
     }
     return tmp;
 }
