@@ -10,6 +10,7 @@ void sortlib(char *path, int length);
 
 void sortsys(char *path, int length);
 
+
 struct record {
     char *tmp;
 };
@@ -51,9 +52,23 @@ int main(int argc, char *argv[]) {
 
     time = times(t_cpu2) - time;
 
-    printf("Real Time: %jd, User Time: %jd, System Time: %jd\n",
-           (intmax_t) time, (intmax_t) (t_cpu2->tms_utime - t_cpu1->tms_utime),
-           (intmax_t) (t_cpu2->tms_stime - t_cpu1->tms_stime));
+    intmax_t res[3] = {(intmax_t) time, (intmax_t) (t_cpu2->tms_utime - t_cpu1->tms_utime),
+                       (intmax_t) (t_cpu2->tms_stime - t_cpu1->tms_stime)};
+
+
+    FILE *wyn = fopen("wyniki.txt", "a");
+
+    if (wyn) {
+        fprintf(wyn, "%s", fun);
+        fprintf(wyn, "%s %d\n", "length: ", length);
+        char t[3][25] = {"Real Time: ", "User Time: ", "System Time: "};
+        int i;
+        for (i = 0; i < 3; i++) {
+            fprintf(wyn, "%s%jd\n", t[i], res[i]);
+        }
+        fprintf(wyn, "\n");
+        fclose(wyn);
+    }
 
     free(t_cpu1);
     free(t_cpu2);
