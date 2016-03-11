@@ -25,6 +25,7 @@ int main(int argc, char *argv[]) {
             if (input!='\n') {
                 switch (input) {
                     case '1': {
+                        printf("case1");
                         int n;
                         scanf("%d", &n);
                         struct flock fl;
@@ -48,12 +49,13 @@ int main(int argc, char *argv[]) {
                         fcntl(fd, F_SETLK, fl);
                         break;
                     }
-                    case '3': {
-                        FILE *file = fopen(filename, "r");
-                        fseek(file, SEEK_END, 0);
-                        long l = ftell(file);
+                    case '3': { // sth not work
+                        printf("tu1");
+                        long l = lseek(fd,0L,SEEK_END);
+                        printf("tu2");
                         long i;
                         for (i = 0; i < l; i++) {
+                            printf("tu3");
                             struct flock fl;
                             fl.l_whence = SEEK_SET;
                             fl.l_len = 1;
@@ -64,8 +66,7 @@ int main(int argc, char *argv[]) {
                                 printf("%li\n", i);
                             }
                         }
-
-                        fclose(file);
+                        printf("tu4");
                         break;
                     }
                     case '4': {
