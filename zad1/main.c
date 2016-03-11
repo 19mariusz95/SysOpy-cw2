@@ -12,7 +12,6 @@ void sortsys(char *path, int length);
 
 struct record {
     char *tmp;
-    size_t length;
 };
 
 
@@ -80,14 +79,14 @@ void sortsys(char *path, int length) {  //read write
     for (i = 1; i * length < end; i++) {
         long j;
         lseek(fd, i * length, SEEK_SET);
-        tmp->length = (size_t) read(fd, tmp->tmp, (size_t) length);
+        read(fd, tmp->tmp, (size_t) length);
         for (j = i - 1; j >= 0; j--) {
             lseek(fd, j * length, SEEK_SET);
-            tmp2->length = (size_t) read(fd, tmp2->tmp, (size_t) length);
+            (size_t) read(fd, tmp2->tmp, (size_t) length);
             if (tmp2->tmp[0] <= tmp->tmp[0]) {
                 for (long k = j + 1; k <= i; k++) {
                     lseek(fd, k * length, SEEK_SET);
-                    tmp2->length = (size_t) read(fd, tmp2->tmp, (size_t) length);
+                    read(fd, tmp2->tmp, (size_t) length);
                     lseek(fd, k * length, SEEK_SET);
                     write(fd, tmp->tmp, (size_t) length);
                     strcpy(tmp->tmp, tmp2->tmp);
@@ -98,7 +97,7 @@ void sortsys(char *path, int length) {  //read write
         if (j == -1) {
             for (long k = j + 1; k <= i; k++) {
                 lseek(fd, k * length, SEEK_SET);
-                tmp2->length = (size_t) read(fd, tmp2->tmp, (size_t) length);
+                read(fd, tmp2->tmp, (size_t) length);
                 lseek(fd, k * length, SEEK_SET);
                 write(fd, tmp->tmp, (size_t) length);
                 strcpy(tmp->tmp, tmp2->tmp);
@@ -132,14 +131,14 @@ void sortlib(char *path, int length) { //fread fwrite
     for (i = 1; i * length < end; i++) {
         long j;
         fseek(file, i * length, SEEK_SET);
-        tmp->length = fread(tmp->tmp, 1, (size_t) length, file);
+        fread(tmp->tmp, 1, (size_t) length, file);
         for (j = i - 1; j >= 0; j--) {
             fseek(file, j * length, SEEK_SET);
-            tmp2->length = fread(tmp2->tmp, 1, (size_t) length, file);
+            fread(tmp2->tmp, 1, (size_t) length, file);
             if (tmp2->tmp[0] <= tmp->tmp[0]) {
                 for (long k = j + 1; k <= i; k++) {
                     fseek(file, k * length, SEEK_SET);
-                    tmp2->length = fread(tmp2->tmp, 1, (size_t) length, file);
+                    fread(tmp2->tmp, 1, (size_t) length, file);
                     fseek(file, k * length, SEEK_SET);
                     fwrite(tmp->tmp, 1, (size_t) length, file);
                     strcpy(tmp->tmp, tmp2->tmp);
@@ -150,7 +149,7 @@ void sortlib(char *path, int length) { //fread fwrite
         if (j == -1) {
             for (long k = j + 1; k <= i; k++) {
                 fseek(file, k * length, SEEK_SET);
-                tmp2->length = fread(tmp2->tmp, 1, (size_t) length, file);
+                fread(tmp2->tmp, 1, (size_t) length, file);
                 fseek(file, k * length, SEEK_SET);
                 fwrite(tmp->tmp, 1, (size_t) length, file);
                 strcpy(tmp->tmp, tmp2->tmp);
