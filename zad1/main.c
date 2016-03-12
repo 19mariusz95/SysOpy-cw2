@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <stdint-gcc.h>
 
 void sortlib(char *path, int length);
 
@@ -103,25 +104,17 @@ void sortsys(char *path, int length) {  //read write
             lseek(fd, j * length, SEEK_SET);
             (size_t) read(fd, tmp2->chars, (size_t) length);
             if (tmp2->chars[0] <= tmp->chars[0]) {
-                for (long k = j + 1; k <= i; k++) {
-                    lseek(fd, k * length, SEEK_SET);
-                    read(fd, tmp2->chars, (size_t) length);
-                    lseek(fd, k * length, SEEK_SET);
-                    write(fd, tmp->chars, (size_t) length);
-                    strcpy(tmp->chars, tmp2->chars);
-                }
                 break;
             }
         }
-        if (j == -1) {
-            for (long k = j + 1; k <= i; k++) {
-                lseek(fd, k * length, SEEK_SET);
-                read(fd, tmp2->chars, (size_t) length);
-                lseek(fd, k * length, SEEK_SET);
-                write(fd, tmp->chars, (size_t) length);
-                strcpy(tmp->chars, tmp2->chars);
-            }
+        for (long k = j + 1; k <= i; k++) {
+            lseek(fd, k * length, SEEK_SET);
+            read(fd, tmp2->chars, (size_t) length);
+            lseek(fd, k * length, SEEK_SET);
+            write(fd, tmp->chars, (size_t) length);
+            strcpy(tmp->chars, tmp2->chars);
         }
+
     }
     free(tmp->chars);
     free(tmp);
@@ -159,25 +152,17 @@ void sortlib(char *path, int length) { //fread fwrite
             fseek(file, j * length, SEEK_SET);
             fread(tmp2->chars, 1, (size_t) length, file);
             if (tmp2->chars[0] <= tmp->chars[0]) {
-                for (long k = j + 1; k <= i; k++) {
-                    fseek(file, k * length, SEEK_SET);
-                    fread(tmp2->chars, 1, (size_t) length, file);
-                    fseek(file, k * length, SEEK_SET);
-                    fwrite(tmp->chars, 1, (size_t) length, file);
-                    strcpy(tmp->chars, tmp2->chars);
-                }
                 break;
             }
         }
-        if (j == -1) {
-            for (long k = j + 1; k <= i; k++) {
-                fseek(file, k * length, SEEK_SET);
-                fread(tmp2->chars, 1, (size_t) length, file);
-                fseek(file, k * length, SEEK_SET);
-                fwrite(tmp->chars, 1, (size_t) length, file);
-                strcpy(tmp->chars, tmp2->chars);
-            }
+        for (long k = j + 1; k <= i; k++) {
+            fseek(file, k * length, SEEK_SET);
+            fread(tmp2->chars, 1, (size_t) length, file);
+            fseek(file, k * length, SEEK_SET);
+            fwrite(tmp->chars, 1, (size_t) length, file);
+            strcpy(tmp->chars, tmp2->chars);
         }
+
     }
     free(tmp->chars);
     free(tmp);
