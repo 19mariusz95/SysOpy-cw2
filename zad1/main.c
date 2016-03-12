@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-void sortsys(char *path, int length) {  //read write
+void sortsys(char *path, int length) {
     int fd = open(path, O_RDWR);
     if (fd < 0) {
         printf("File not opened");
@@ -124,7 +124,7 @@ void sortsys(char *path, int length) {  //read write
     close(fd);
 }
 
-void sortlib(char *path, int length) { //fread fwrite
+void sortlib(char *path, int length) {
     FILE *file = fopen(path, "r+");
     long end;
     if (file == NULL) {
