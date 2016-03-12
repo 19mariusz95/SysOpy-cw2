@@ -3,6 +3,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <bits/errno.h>
+#include <string.h>
 
 char trololo[7][21] = {"1: set read lock", "2: set write lock", "3: show locked chars", "4: unlock", "5: read char",
                        "6: write char", "7: end"};
@@ -38,8 +39,7 @@ int main(int argc, char *argv[]) {
                         fl.l_whence = SEEK_SET;
                         fl.l_len = 1;
                         fl.l_start = n;
-                        int tmp = fcntl(fd, F_SETLK, fl);
-                        if (tmp == -1) {
+                        if (fcntl(fd, F_SETLK, &fl) == -1) {
                             perror(NULL);
                         }
                         break;
@@ -53,8 +53,7 @@ int main(int argc, char *argv[]) {
                         fl.l_whence = SEEK_SET;
                         fl.l_len = 1;
                         fl.l_start = n;
-                        int tmp = fcntl(fd, F_SETLK, fl);
-                        if (tmp == -1) {
+                        if (fcntl(fd, F_SETLK, &fl) == -1) {
                             perror(NULL);
                         }
                         break;
@@ -65,14 +64,15 @@ int main(int argc, char *argv[]) {
                         for (i = 0; i < l; i++) {
                             lseek(fd, i, SEEK_SET);
                             struct flock fl;
+                            memset(&fl, 0, sizeof(struct flock));
                             fl.l_whence = SEEK_SET;
                             fl.l_len = 1;
                             fl.l_start = i;
-                            fl.l_type = F_WRLCK;
-                            fl.l_pid = getpid();
-                            fcntl(fd, F_GETLK, fl);
-                            if (fl.l_type != F_UNLCK) {
-                                printf("%li\n", i);
+                            if (fcntl(fd, F_GETLK, &fl) == -1) {
+                                perror(NULL);
+                            }
+                            else if (fl.l_type != F_UNLCK) {
+                                printf("%li %d %s\n", i, fl.l_pid, fl.l_type == F_WRLCK ? "write" : "read");
                             }
                         }
                         break;
@@ -86,7 +86,9 @@ int main(int argc, char *argv[]) {
                         fl.l_whence = SEEK_SET;
                         fl.l_len = 1;
                         fl.l_start = n;
-                        fcntl(fd, F_SETLK, fl);
+                        if (fcntl(fd, F_SETLK, &fl) == -1) {
+                            perror(NULL);
+                        }
                         break;
                     }
                     case '5': {
