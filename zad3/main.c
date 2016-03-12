@@ -2,11 +2,14 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <bits/errno.h>
 
 char trololo[7][21] = {"1: set read lock", "2: set write lock", "3: show locked chars", "4: unlock", "5: read char",
                        "6: write char", "7: end"};
 
 void print_options();
+
+void free_is();
 
 int main(int argc, char *argv[]) {
 
@@ -21,11 +24,12 @@ int main(int argc, char *argv[]) {
         int flag = 1;
         print_options();
         char input;
-        while (flag && (input = (char) getchar()) != '7') {
-            if (input!='\n') {
+        while (flag) {
+            input = (char) getchar();
+            if (input != '\n') {
+                free_is();
                 switch (input) {
                     case '1': {
-                        printf("case1");
                         int n;
                         scanf("%d", &n);
                         struct flock fl;
@@ -34,7 +38,10 @@ int main(int argc, char *argv[]) {
                         fl.l_whence = SEEK_SET;
                         fl.l_len = 1;
                         fl.l_start = n;
-                        fcntl(fd, F_SETLK, fl);
+                        int tmp = fcntl(fd, F_SETLK, fl);
+                        if (tmp == -1) {
+                            perror(NULL);
+                        }
                         break;
                     }
                     case '2': {
@@ -46,27 +53,28 @@ int main(int argc, char *argv[]) {
                         fl.l_whence = SEEK_SET;
                         fl.l_len = 1;
                         fl.l_start = n;
-                        fcntl(fd, F_SETLK, fl);
+                        int tmp = fcntl(fd, F_SETLK, fl);
+                        if (tmp == -1) {
+                            perror(NULL);
+                        }
                         break;
                     }
-                    case '3': { // sth not work
-                        printf("tu1");
-                        long l = lseek(fd,0L,SEEK_END);
-                        printf("tu2");
+                    case '3': {
+                        long l = lseek(fd, 0L, SEEK_END);
                         long i;
                         for (i = 0; i < l; i++) {
-                            printf("tu3");
+                            lseek(fd, i, SEEK_SET);
                             struct flock fl;
                             fl.l_whence = SEEK_SET;
                             fl.l_len = 1;
                             fl.l_start = i;
                             fl.l_type = F_WRLCK;
+                            fl.l_pid = getpid();
                             fcntl(fd, F_GETLK, fl);
                             if (fl.l_type != F_UNLCK) {
                                 printf("%li\n", i);
                             }
                         }
-                        printf("tu4");
                         break;
                     }
                     case '4': {
@@ -85,7 +93,7 @@ int main(int argc, char *argv[]) {
                         int n;
                         scanf("%d", &n);
                         char c[1];
-                        lseek(fd, SEEK_SET, n);
+                        lseek(fd, n, SEEK_SET);
                         read(fd, c, 1);
                         printf("%c\n", c[0]);
                         break;
@@ -93,6 +101,8 @@ int main(int argc, char *argv[]) {
                     case '6': {
                         int n;
                         scanf("%d", &n);
+                        free_is();
+                        lseek(fd, n, SEEK_SET);
                         char c[1];
                         scanf("%c", &c[0]);
                         write(fd, c, 1);
@@ -112,10 +122,14 @@ int main(int argc, char *argv[]) {
         }
         close(fd);
     } else {
-        printf("Trololololo\n");
+        perror(NULL);
         exit(1);
     }
     return 0;
+}
+
+void free_is() {
+    while ((getchar()) != '\n');
 }
 
 void print_options() {
