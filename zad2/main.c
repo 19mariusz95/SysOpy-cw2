@@ -10,21 +10,24 @@ char *permissions;
 
 typedef struct FTW FTW;
 
-void find1(char *path, char *permissions);
+void find1(char *path);
 
-void find2(char *path, char *permissions);
+void find2(char *path);
 
-int fun(char *permissions, struct stat stat1);
+int fun(struct stat stat1);
 
 void nftw(char *path, int (*info)(const char *, const struct stat *, int, struct FTW *), int i, int flag);
 
-int display_info(const char *fpath, const struct stat *sb, int tflag, struct FTW *ftwbus) {
 
-    if (fun(*sb)) {
+int display_info(const char *fpath, const struct stat *sb, int tflag, struct FTW *ftwbus) {
+    if (tflag == FTW_F && fun(*sb)) {
         char p[PATH_MAX];
         realpath(fpath, p);
-        printf("%s\n", p);
-
+        FILE *file = fopen(fpath, "r");
+        fseek(file, 0L, SEEK_END);
+        long d = ftell(file);
+        fclose(file);
+        printf("%s size: %ld b, last accessed: %ld\n", p, d, sb->st_atim);
     }
     return 0;
 }
@@ -38,16 +41,25 @@ int main(int argc, char *argv[]) {
     permissions = argv[2];
 
     if (strlen(permissions) != 9) {
-        printf("Trolollo");
+        printf("Bad permissions arg");
         exit(1);
     }
 
-    find2(path, permissions);
+    printf("Options\n1- relative path\n2- absolute path\n");
+    int option;
+    scanf("%d", &option);
+    if (option == 1) {
+        find1(path);
+    } else if (option == 2)
+        find2(path);
+    else
+        printf("%s %d", "There is no option", option);
+
 
     return 0;
 }
 
-void find1(char *path, char *permissions) {
+void find1(char *path) {
 
     DIR *dir = opendir(path);
     struct stat filestat;
@@ -70,18 +82,22 @@ void find1(char *path, char *permissions) {
         strncpy(fn + len, ent->d_name, FILENAME_MAX - len);
         stat(fn, &filestat);
         if (S_ISDIR(filestat.st_mode)) {
-            find1(fn, permissions);
+            find1(fn);
         }
         else if (S_ISREG(filestat.st_mode) == 1) {
-            if (fun(filestat))
-                printf("%s\n", ent->d_name);
+            if (fun(filestat)) {
+                FILE *file = fopen(fn, "r");
+                fseek(file, 0L, SEEK_END);
+                long d = ftell(file);
+                fclose(file);
+                printf("%s size: %ld b, last accessed: %ld\n", ent->d_name, d, filestat.st_atim);
+            }
         }
     }
     closedir(dir);
 }
 
-void find2(char *path, char *permissions) {
-    DIR *dir = opendir(path);
+void find2(char *path) {
     nftw(path, display_info, 10, FTW_F);
 }
 
