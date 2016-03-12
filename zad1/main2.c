@@ -31,11 +31,10 @@ int main(int argc, char *argv[]) {
 
     if (file) {
         generate(file, length, n);
-        printf("trolololo");
-    }
-
-    if (file)
         fclose(file);
+    } else {
+        perror(NULL);
+    }
 
     return 0;
 }

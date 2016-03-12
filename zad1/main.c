@@ -12,7 +12,7 @@ void sortsys(char *path, int length);
 
 
 struct record {
-    char *tmp;
+    char *chars;
 };
 
 
@@ -85,8 +85,12 @@ void sortsys(char *path, int length) {  //read write
     long end;
     struct record *tmp = malloc(sizeof(struct record));
     struct record *tmp2 = malloc(sizeof(struct record));
-    tmp->tmp = malloc(length * sizeof(char));
-    tmp2->tmp = malloc(length * sizeof(char));
+    tmp->chars = malloc(length * sizeof(char));
+    tmp2->chars = malloc(length * sizeof(char));
+    if (tmp->chars == NULL || tmp2->chars == NULL) {
+        printf("%s", "Allocation failed");
+        exit(1);
+    }
 
     end = lseek(fd, 0, SEEK_END);
     lseek(fd, 0, SEEK_SET);
@@ -94,17 +98,17 @@ void sortsys(char *path, int length) {  //read write
     for (i = 1; i * length < end; i++) {
         long j;
         lseek(fd, i * length, SEEK_SET);
-        read(fd, tmp->tmp, (size_t) length);
+        read(fd, tmp->chars, (size_t) length);
         for (j = i - 1; j >= 0; j--) {
             lseek(fd, j * length, SEEK_SET);
-            (size_t) read(fd, tmp2->tmp, (size_t) length);
-            if (tmp2->tmp[0] <= tmp->tmp[0]) {
+            (size_t) read(fd, tmp2->chars, (size_t) length);
+            if (tmp2->chars[0] <= tmp->chars[0]) {
                 for (long k = j + 1; k <= i; k++) {
                     lseek(fd, k * length, SEEK_SET);
-                    read(fd, tmp2->tmp, (size_t) length);
+                    read(fd, tmp2->chars, (size_t) length);
                     lseek(fd, k * length, SEEK_SET);
-                    write(fd, tmp->tmp, (size_t) length);
-                    strcpy(tmp->tmp, tmp2->tmp);
+                    write(fd, tmp->chars, (size_t) length);
+                    strcpy(tmp->chars, tmp2->chars);
                 }
                 break;
             }
@@ -112,16 +116,16 @@ void sortsys(char *path, int length) {  //read write
         if (j == -1) {
             for (long k = j + 1; k <= i; k++) {
                 lseek(fd, k * length, SEEK_SET);
-                read(fd, tmp2->tmp, (size_t) length);
+                read(fd, tmp2->chars, (size_t) length);
                 lseek(fd, k * length, SEEK_SET);
-                write(fd, tmp->tmp, (size_t) length);
-                strcpy(tmp->tmp, tmp2->tmp);
+                write(fd, tmp->chars, (size_t) length);
+                strcpy(tmp->chars, tmp2->chars);
             }
         }
     }
-    free(tmp->tmp);
+    free(tmp->chars);
     free(tmp);
-    free(tmp2->tmp);
+    free(tmp2->chars);
     free(tmp2);
 
     close(fd);
@@ -136,8 +140,12 @@ void sortlib(char *path, int length) { //fread fwrite
     }
     struct record *tmp = malloc(sizeof(struct record));
     struct record *tmp2 = malloc(sizeof(struct record));
-    tmp->tmp = malloc(length * sizeof(char));
-    tmp2->tmp = malloc(length * sizeof(char));
+    tmp->chars = malloc(length * sizeof(char));
+    tmp2->chars = malloc(length * sizeof(char));
+    if (tmp->chars == NULL || tmp2->chars == NULL) {
+        printf("%s", "Allocation failed");
+        exit(1);
+    }
 
     fseek(file, 0L, SEEK_END);
     end = ftell(file);
@@ -146,17 +154,17 @@ void sortlib(char *path, int length) { //fread fwrite
     for (i = 1; i * length < end; i++) {
         long j;
         fseek(file, i * length, SEEK_SET);
-        fread(tmp->tmp, 1, (size_t) length, file);
+        fread(tmp->chars, 1, (size_t) length, file);
         for (j = i - 1; j >= 0; j--) {
             fseek(file, j * length, SEEK_SET);
-            fread(tmp2->tmp, 1, (size_t) length, file);
-            if (tmp2->tmp[0] <= tmp->tmp[0]) {
+            fread(tmp2->chars, 1, (size_t) length, file);
+            if (tmp2->chars[0] <= tmp->chars[0]) {
                 for (long k = j + 1; k <= i; k++) {
                     fseek(file, k * length, SEEK_SET);
-                    fread(tmp2->tmp, 1, (size_t) length, file);
+                    fread(tmp2->chars, 1, (size_t) length, file);
                     fseek(file, k * length, SEEK_SET);
-                    fwrite(tmp->tmp, 1, (size_t) length, file);
-                    strcpy(tmp->tmp, tmp2->tmp);
+                    fwrite(tmp->chars, 1, (size_t) length, file);
+                    strcpy(tmp->chars, tmp2->chars);
                 }
                 break;
             }
@@ -164,16 +172,16 @@ void sortlib(char *path, int length) { //fread fwrite
         if (j == -1) {
             for (long k = j + 1; k <= i; k++) {
                 fseek(file, k * length, SEEK_SET);
-                fread(tmp2->tmp, 1, (size_t) length, file);
+                fread(tmp2->chars, 1, (size_t) length, file);
                 fseek(file, k * length, SEEK_SET);
-                fwrite(tmp->tmp, 1, (size_t) length, file);
-                strcpy(tmp->tmp, tmp2->tmp);
+                fwrite(tmp->chars, 1, (size_t) length, file);
+                strcpy(tmp->chars, tmp2->chars);
             }
         }
     }
-    free(tmp->tmp);
+    free(tmp->chars);
     free(tmp);
-    free(tmp2->tmp);
+    free(tmp2->chars);
     free(tmp2);
 
     fclose(file);
