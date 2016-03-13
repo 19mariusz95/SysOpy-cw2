@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
     FILE *wyn = fopen("wyniki.txt", "a");
 
     if (wyn) {
-        fprintf(wyn, "%s", fun);
+        fprintf(wyn, "%s ", fun);
         fprintf(wyn, "%s %d\n", "length: ", length);
         char t[3][25] = {"Real Time: ", "User Time: ", "System Time: "};
         int i;
