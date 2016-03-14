@@ -5,8 +5,8 @@
 #include <bits/errno.h>
 #include <string.h>
 
-char trololo[7][21] = {"1: set read lock", "2: set write lock", "3: show locked chars", "4: unlock", "5: read char",
-                       "6: write char", "7: end"};
+char *options[7] = {"1: set read lock", "2: set write lock", "3: show locked chars", "4: unlock", "5: read char",
+                    "6: write char", "7: end"};
 
 void print_options();
 
@@ -139,5 +139,5 @@ void free_is() {
 void print_options() {
     int i;
     for (i = 0; i < 7; i++)
-        printf("%s\n", trololo[i]);
+        printf("%s\n", options[i]);
 }
