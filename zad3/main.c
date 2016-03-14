@@ -71,17 +71,10 @@ int main(int argc, char *argv[]) {
                                 perror(NULL);
                             }
                             else if (fl.l_type != F_UNLCK) {
-                                printf("%li %d %s\n", i, fl.l_pid, "write");
-                            }
-                            fl.l_whence = SEEK_SET;
-                            fl.l_len = 1;
-                            fl.l_start = i;
-                            fl.l_type = F_RDLCK;
-                            if (fcntl(fd, F_GETLK, &fl) == -1) {
-                                perror(NULL);
-                            }
-                            else if (fl.l_type != F_UNLCK) {
-                                printf("%li %d %s\n", i, fl.l_pid, "read");
+                                if (fl.l_type == F_WRLCK)
+                                    printf("%li %d %s\n", i, fl.l_pid, "write");
+                                else if (fl.l_type == F_RDLCK)
+                                    printf("%li %d %s\n", i, fl.l_pid, "read");
                             }
                         }
                         break;
