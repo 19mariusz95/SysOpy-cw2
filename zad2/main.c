@@ -27,7 +27,7 @@ int display_info(const char *fpath, const struct stat *sb, int tflag, struct FTW
         fseek(file, 0L, SEEK_END);
         long d = ftell(file);
         fclose(file);
-        printf("%s size: %ld b, last accessed: %ld\n", p, d, sb->st_atim);
+        printf("%s size: %ld b, last accessed: %ld\n", p, d, sb->st_atim.tv_sec);
     }
     return 0;
 }
@@ -90,7 +90,7 @@ void find1(char *path) {
                 fseek(file, 0L, SEEK_END);
                 long d = ftell(file);
                 fclose(file);
-                printf("%s size: %ld b, last accessed: %ld\n", ent->d_name, d, filestat.st_atim);
+                printf("%s size: %ld b, last accessed: %ld\n", ent->d_name, d, filestat.st_atim.tv_sec);
             }
         }
     }
